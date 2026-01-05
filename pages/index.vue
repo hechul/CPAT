@@ -1,41 +1,47 @@
 <script setup>
-/**
- * [필수 모듈 가져오기]
- * - client: Supabase 서버와 직접 통신하기 위한 도구 (ID 확인용)
- * - useAuth, usePosts: 미리 만들어둔 기능 뭉치들 (로그아웃, 게시글 CRUD)
- */
 const client = useSupabaseClient()
 const { signOut } = useAuth()
-const { posts, fetchPosts, createPost, deletePost } = usePosts()
+const { posts, fetchPosts, createPost, deletePost, uploadImage } = usePosts()
 
-// 화면 상태를 관리하는 변수들
-const content = ref('')       // 글쓰기 입력창 내용
-const myUserId = ref(null)    // 현재 로그인한 내 진짜 ID (삭제 권한 확인용)
-const myEmail = ref('')       // 화면에 보여줄 내 이메일
+const selectedFile = ref(null) 
+const content = ref('')
+const myUserId = ref(null) 
+const myEmail = ref('')
+const fileInput = ref(null) // 파일 선택창 초기화용
 
-// [페이지 로딩 시 실행]
 onMounted(async () => {
-  // 1. 게시글 목록을 먼저 불러옵니다.
   await fetchPosts()
-
-  // 2. [핵심] 현재 로그인한 유저 정보를 서버에 직접 물어봐서 가져옵니다.
-  // (자동 변수 user에 의존하면 가끔 타이밍 문제로 ID가 비어있을 수 있어서, 이 방식이 제일 확실합니다.)
   const { data: { user } } = await client.auth.getUser()
-  
   if (user) {
-    myUserId.value = user.id      // 내 ID 저장 (이게 있어야 삭제 버튼이 보임)
-    myEmail.value = user.email    // 내 이메일 저장
+    myUserId.value = user.id
+    myEmail.value = user.email
   }
 })
 
-// [글 등록 함수]
-const handlePost = async () => {
-  if (!content.value.trim()) return // 빈 내용이면 무시
-  await createPost(content.value)
-  content.value = '' // 입력창 초기화
+// ✅ [수정 1] 함수를 onMounted 밖으로 꺼냈습니다. (이제 화면에서 쓸 수 있음!)
+const handleFileChange = (event) => {
+  selectedFile.value = event.target.files[0]
 }
 
-// [글 삭제 함수]
+const handlePost = async () => {
+  if (!content.value.trim()) return
+
+  let imageUrl = null
+
+  // 1. 파일이 있으면 업로드
+  if (selectedFile.value) {
+    imageUrl = await uploadImage(selectedFile.value)
+  }
+
+  // 2. 글 쓰기
+  await createPost(content.value, imageUrl)
+  
+  // 3. 초기화
+  content.value = ''
+  selectedFile.value = null
+  if (fileInput.value) fileInput.value.value = '' // 파일 선택창 비우기
+}
+
 const handleDelete = async (id) => {
   await deletePost(id)
 }
@@ -55,13 +61,22 @@ const handleDelete = async (id) => {
         <button @click="signOut" class="logout-btn">로그아웃</button>
       </div>
 
-      <div class="write-box">
+      <div class="write-container">
         <textarea 
           v-model="content" 
-          placeholder="무슨 일이 있었나요? 자유롭게 적어보세요." 
+          placeholder="무슨 일이 있었나요?" 
           rows="3"
         ></textarea>
-        <button @click="handlePost">등록</button>
+        
+        <div class="action-row">
+          <input 
+            type="file" 
+            ref="fileInput"
+            @change="handleFileChange" 
+            accept="image/*" 
+          />
+          <button @click="handlePost">등록</button>
+        </div>
       </div>
 
       <ul class="post-list">
@@ -69,7 +84,6 @@ const handleDelete = async (id) => {
           
           <div class="post-header-row">
             <strong>{{ post.email }}</strong>
-            
             <button 
               v-if="myUserId === post.user_id" 
               @click="handleDelete(post.id)"
@@ -80,13 +94,19 @@ const handleDelete = async (id) => {
           </div>
 
           <p class="post-content">{{ post.content }}</p>
+
+          <div v-if="post.image_url" class="image-preview">
+            <img :src="post.image_url" alt="업로드된 사진" />
+          </div>
           
           <small class="post-date">
-            {{ new Date(post.post_created).toLocaleString() }}
+            {{ new Date(post.created_at).toLocaleString() }}
           </small>
           
-          <CommentSection :postId="post.id"
-          :currentUserId="myUserId" />
+          <CommentSection 
+            :postId="post.id"
+            :currentUserId="myUserId" 
+          />
         </li>
       </ul>
     </div>
@@ -94,35 +114,30 @@ const handleDelete = async (id) => {
 </template>
 
 <style scoped>
-/* 전체 레이아웃 */
 .container { max-width: 600px; margin: 0 auto; padding: 20px; font-family: sans-serif; color: #333; }
-
-/* 로그인 경고창 */
 .login-alert { text-align: center; margin-top: 100px; }
-.link { color: #2563eb; font-weight: bold; text-decoration: none; font-size: 1.1rem; }
-.link:hover { text-decoration: underline; }
+.link { color: #2563eb; font-weight: bold; }
 
-/* 헤더 */
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #f3f4f6; }
-.user-info { font-weight: 600; color: #1f2937; }
-.logout-btn { background: #9ca3af; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 6px; font-size: 0.85rem; transition: background 0.2s; }
-.logout-btn:hover { background: #6b7280; }
+.header { display: flex; justify-content: space-between; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #f3f4f6; }
+.logout-btn { background: #9ca3af; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
 
-/* 글쓰기 박스 */
-.write-box { display: flex; gap: 10px; margin-bottom: 30px; }
-textarea { flex: 1; padding: 12px; border: 1px solid #e5e7eb; resize: none; border-radius: 8px; outline: none; transition: border 0.2s; }
+/* 글쓰기 영역 스타일 수정 */
+.write-container { margin-bottom: 30px; display: flex; flex-direction: column; gap: 10px; }
+textarea { padding: 12px; border: 1px solid #e5e7eb; resize: none; border-radius: 8px; width: 100%; box-sizing: border-box; outline: none; }
 textarea:focus { border-color: #3b82f6; }
-.write-box button { background: #2563eb; color: white; border: none; padding: 0 24px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
-.write-box button:hover { background: #1d4ed8; }
 
-/* 게시글 목록 */
+.action-row { display: flex; justify-content: space-between; align-items: center; }
+.action-row button { background: #2563eb; color: white; border: none; padding: 8px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+.action-row button:hover { background: #1d4ed8; }
+
 .post-list { list-style: none; padding: 0; }
 .post-item { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.post-header-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.delete-btn { color: #ef4444; background: none; border: none; cursor: pointer; font-weight: bold; }
 
-/* 게시글 내부 요소 */
-.post-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.delete-btn { background: transparent; color: #ef4444; border: none; cursor: pointer; font-size: 0.9rem; font-weight: 600; padding: 4px 8px; border-radius: 4px; }
-.delete-btn:hover { background: #fef2f2; }
-.post-content { margin-bottom: 10px; line-height: 1.5; white-space: pre-wrap; }
-.post-date { color: #9ca3af; font-size: 0.8rem; display: block; margin-bottom: 15px; }
+/* 이미지 스타일 */
+.image-preview { margin-top: 10px; margin-bottom: 10px; }
+.image-preview img { max-width: 100%; border-radius: 8px; max-height: 400px; object-fit: cover; }
+
+.post-date { color: #9ca3af; font-size: 0.8rem; }
 </style>
