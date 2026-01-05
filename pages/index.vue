@@ -100,7 +100,7 @@ const handleDelete = async (id) => {
           </div>
           
           <small class="post-date">
-            {{ new Date(post.created_at).toLocaleString() }}
+            {{ new Date(post.post_created).toLocaleString() }}
           </small>
           
           <CommentSection 
