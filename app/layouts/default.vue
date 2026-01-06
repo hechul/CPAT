@@ -7,7 +7,7 @@ const handleLogout = async () => {
   await supabase.auth.signOut()
   router.push('/')
 }
-
+// r
 // 닉네임 추출 (이메일 앞부분)
 const nickname = computed(() => {
   if (!user.value?.email) return '사용자'
