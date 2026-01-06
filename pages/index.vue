@@ -53,7 +53,7 @@ const handleDelete = async (id) => {
     <div v-if="!myUserId" class="login-alert">
       <p>로그인이 필요한 서비스입니다.</p>
       <NuxtLink to="/login" class="link">로그인하러 가기</NuxtLink>
-    </div>
+    </div>  
 
     <div v-else>
       <div class="header">
@@ -97,7 +97,7 @@ const handleDelete = async (id) => {
 
           <div v-if="post.image_url" class="image-preview">
             <img :src="post.image_url" alt="업로드된 사진" />
-          </div>
+          </div>  
           
           <small class="post-date">
             {{ new Date(post.post_created).toLocaleString() }}

@@ -1,7 +1,8 @@
 // composables/usePosts.js
 export const usePosts = () => {
   const client = useSupabaseClient()
-  const posts = ref([])
+  // [수정] ref 대신 useState를 사용하여 여러 컴포넌트가 같은 데이터를 공유하게 함
+  const posts = useState('posts', () => [])
 
   // 1. 목록 가져오기
   const fetchPosts = async () => {
