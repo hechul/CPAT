@@ -1,53 +1,102 @@
-# 대화 기록
+# 📂 프로젝트 현황 보고서: 오픈펫케어랩 (Open Pet Care Lab)
 
-이 파일은 Gemini와의 대화 내용을 기록하기 위해 생성되었습니다.
-대화 내용이 길어져 컨텍스트를 잃는 것을 방지하고, 이전 작업 내용을 참고하기 위한 목적으로 사용됩니다.
-
-### 2026년 1월 5일 대화 내용 - 사업계획서 학습 결과
-
-두 사업계획서의 핵심은 **'보호자의 기록'**을 통해 반려동물 펫푸드 시장의 정보 비대칭과 불신 문제를 해결하려는 플랫폼인 **'오픈펫케어랩'** 개발입니다.
-
-**주요 문제 인식:**
-*   **소비자:** 광고/후기에 의존하며, 급여 후 반려동물 반응 기록 어려움.
-*   **산업:** 신제품 검증 데이터 부족, R&D 비효율, 신뢰도 저하.
-
-**핵심 해결 방안:**
-1.  **퀘스트 기반 기록 (UX):** 보호자가 반려동물 상태를 꾸준히 기록하도록 유도.
-2.  **오픈 위키형 DB:** 보호자들이 제품 정보 등록/검증하는 개방형 DB 구축.
-3.  **자동 리포트:** 축적된 데이터로 맞춤형 건강 리포트(PDF, 웹) 자동 생성.
-
-**'수정사업계획서' 주요 특징:**
-*   **'오픈펫케어랩'**으로 프로젝트명 명확화.
-*   팀 구성, MVP 개발, PoC, B2B 협력 등 **구체적인 사업 추진 일정** 제시.
-*   수익 모델(리포트 판매, B2B 퀘스트, 데이터 판매 등) 상세화.
-
-목표는 보호자 참여를 통해 신뢰도 높은 데이터를 쌓고, 이를 보호자 및 산업(펫푸드 제조사, 연구기관 등) 모두에게 가치 있는 정보로 제공하는 데이터 선순환 플랫폼 구축입니다.
+> **이 문서는 프로젝트의 모든 컨텍스트를 담고 있는 "마스터 인계장"입니다. 새로운 세션 시작 시 반드시 이 파일을 정독하고 업무를 시작하십시오.**
 
 ---
 
-### 2026년 1월 5일 대화 내용 - Nuxt/Supabase 코드 리뷰
+## 1. 프로젝트 개요 (Project Goal)
+*   **서비스명:** 오픈펫케어랩 (Open Pet Care Lab)
+*   **핵심 가치:** "보호자의 기록이 펫푸드 산업의 기준이 된다."
+*   **문제 해결:** 펫푸드 시장의 정보 비대칭 및 신뢰도 저하 문제를 해결하기 위해, 보호자가 직접 반려동물의 급여 반응(변 상태, 기호성 등)을 기록하고 데이터를 공유하는 플랫폼.
+*   **주요 기능:**
+    1.  **퀘스트 기반 기록:** 게임화된 미션을 통한 지속적인 기록 유도.
+    2.  **오픈 위키형 DB:** 집단지성을 활용한 중립적 제품 정보 구축.
+    3.  **데이터 리포트:** 축적된 기록을 분석하여 맞춤형 PDF/웹 리포트 제공.
 
-'오픈펫케어랩' 프로젝트의 Nuxt.js 및 Supabase 기반 웹 애플리케이션 코드에 대한 전체 리뷰를 진행함.
+## 2. Gemini 행동 요령 (Action Guidelines)
+**이 프로젝트를 수행하는 모든 AI 에이전트는 아래 규칙을 엄수해야 합니다.**
 
-**주요 작업 내용:**
-1.  **코드 구조 분석:**
-    *   인증 관련 로직은 `composables/useAuth.js`에, 게시물 관련 로직은 `composables/usePosts.js`에 명확히 분리되었음을 확인.
-    *   페이지 컴포넌트 (`pages/index.vue`, `pages/login.vue`)가 각 Composable을 적절히 활용하고 있음을 검토.
-2.  **핵심 로직 검증:**
-    *   `usePosts.js`의 `createPost` 함수 내에서 `client.auth.getUser()`를 호출하여, OAuth 로그인 직후 발생할 수 있는 사용자 정보 불일치(stale data) 문제를 해결한 것을 확인함. 이는 매우 중요한 수정 사항임.
-3.  **설정 파일 검토:**
-    *   `nuxt.config.ts`에 Supabase 및 TailwindCSS 모듈이 올바르게 설정되었고, 리디렉션 옵션도 적절함을 확인.
-4.  **결론:**
-    *   코드는 관심사 분리 원칙에 따라 잘 리팩토링되었으며, 주요 기능이 올바르게 작동할 것으로 판단됨.
-    *   전체적인 코드 구조와 로직의 정확성을 확인하고 상세 설명을 제공함.
+1.  **로그 업데이트 (최우선 순위):**
+    *   **기능 구현, 버그 수정, SQL 변경 등 유의미한 작업 후에는 반드시 이 파일(`conversation_log.md`)을 즉시 업데이트하십시오.**
+    *   사용자가 별도로 요청하지 않아도 수행해야 하는 **자동 프로토콜**입니다.
+2.  **DB 컬럼명 엄수:**
+    *   `posts` 테이블의 날짜 컬럼은 `created_at`이 아니라 **`post_created`**입니다.
+    *   `comments` 테이블은 `created_at`입니다.
+3.  **Storage(이미지) 처리 원칙:**
+    *   **파일명:** 한글/특수문자 에러 방지를 위해 반드시 **영문 난수(Random String)**로 변환하여 저장해야 합니다.
+    *   **삭제:** DB 레코드 삭제 시 `decodeURIComponent`를 거쳐 Storage 파일도 함께 삭제해야 합니다.
+4.  **에러 핸들링:**
+    *   `alert` 창 등을 통해 구체적인 에러 메시지를 사용자에게 노출하여 디버깅을 도와야 합니다.
 
-### 2026년 1월 5일 대화 내용 - 컬럼명 불일치 해결 및 스토리지 설정
+## 3. 기술 스택 (Tech Stack)
+*   **Frontend:** Nuxt.js 3 (Vue 3)
+*   **Styling:** TailwindCSS
+*   **Backend / DB:** Supabase (PostgreSQL, Auth, Storage)
+*   **Language:** JavaScript / TypeScript
 
-**1. 게시글 시간 미표시 문제 해결:**
-*   **상황:** 사용자가 실제 DB 테이블(`posts`)의 날짜 컬럼이 `post_created`라고 확인해 줌. (제공된 SQL 스크립트와 달랐음)
-*   **원인:** `usePosts.js`(데이터 로딩)는 `post_created`를 올바르게 사용했으나, `pages/index.vue`(화면 표시)에서 `created_at`을 참조하여 날짜가 보이지 않음.
-*   **조치:** `pages/index.vue`에서 날짜 표시 필드를 `post.created_at` → `post.post_created`로 수정 완료.
+## 4. 현재 개발 진행 상황 (Current Status)
+**작성일:** 2026년 1월 5일
+**단계:** 초기 MVP 개발 및 핵심 기능 구현
 
-**2. 이미지 업로드 문제 해결:**
-*   **원인:** Supabase Storage 버킷(`images`) 및 접근 권한(Policy) 부재.
-*   **조치:** 사용자에게 Storage 버킷 생성 및 권한 설정(SELECT, INSERT)을 위한 SQL 스크립트를 제공함. 사용자가 이를 Supabase SQL Editor에서 실행하면 해결됨.
+### ✅ 구현 완료된 기능
+1.  **사용자 인증 (Auth)**
+    *   Supabase Auth 연동 (이메일/OAuth).
+2.  **게시글 (Posts - 메인 피드)**
+    *   목록 조회, 게시글 작성, 삭제 기능 구현.
+    *   **[완료]** 이미지 업로드 구현 (한글명 에러 해결을 위해 **영문 난수 변환 로직** 적용).
+    *   **[완료]** 게시글 삭제 시 Storage 이미지 자동 삭제 구현.
+    *   **[완료]** 작성일(`post_created`) 표시 정상화.
+3.  **댓글 (Comments)**
+    *   게시글별 댓글 작성, 조회, 삭제 기능 구현.
+
+### ⚠️ 현재 이슈 및 해결 방법 (Pending Actions)
+*   **현재 이슈 없음:** 게시판 CRUD 및 이미지 기능 정상 작동 중.
+*   **다음 과제:** 퀘스트 기능 기획 및 구현 시작 필요.
+
+## 5. 데이터베이스 구조 & 보안 정책 (Database Schema & RLS)
+코드 작성 시 아래 컬럼명과 보안 규칙을 정확히 준수해야 합니다.
+
+### `posts` 테이블 (게시글)
+*   **RLS 정책:**
+    *   `SELECT`: 누구나 가능 (public)
+    *   `INSERT`: 로그인한 사용자만 (authenticated)
+    *   `DELETE`: 본인이 작성한 글만 (`auth.uid() = user_id`)
+
+| 컬럼명 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `id` | bigint | Primary Key (Auto Increment) |
+| `user_id` | uuid | 작성자 ID (Auth 연동) |
+| `email` | text | 작성자 이메일 |
+| `content` | text | 게시글 내용 |
+| `image_url` | text | 업로드된 이미지 URL |
+| `post_created` | timestamp | **작성일** (주의: created_at 아님) |
+
+### `comments` 테이블 (댓글)
+*   **RLS 정책:**
+    *   `SELECT`: 누구나 가능 (public)
+    *   `INSERT`: 로그인한 사용자만 (authenticated)
+    *   `DELETE`: 본인이 작성한 댓글만 (`auth.uid() = user_id`)
+
+| 컬럼명 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `id` | bigint | Primary Key |
+| `post_id` | bigint | FK (posts.id) - On Delete Cascade |
+| `user_id` | uuid | 작성자 ID |
+| `email` | text | 작성자 이메일 |
+| `content` | text | 댓글 내용 |
+| `created_at` | timestamp | 작성일 |
+
+## 6. 다음 개발 목표 (Next Steps)
+1.  **퀘스트(Quest) 기능 구현:** 사용자가 수행할 미션 UI 및 DB 설계.
+2.  **위키(Wiki) 데이터베이스:** 제품 정보 등록 및 수정 기능.
+3.  **마이페이지/리포트:** 사용자가 기록한 데이터를 시각화하여 보여주는 대시보드.
+
+## 7. 필수 설정 SQL (Storage)
+*이미 적용 완료됨 (참고용)*
+```sql
+-- Storage 설정 SQL (이미지 업로드/삭제용)
+insert into storage.buckets (id, name, public) values ('images', 'images', true);
+create policy "Give public access to images" on storage.objects for select using ( bucket_id = 'images' );
+create policy "Enable upload for authenticated users" on storage.objects for insert to authenticated with check ( bucket_id = 'images' );
+create policy "Enable delete for authenticated users" on storage.objects for delete to authenticated using ( bucket_id = 'images' );
+```
