@@ -67,8 +67,8 @@ const handleGoogleLogin = async () => {
 </script>
 
 <template>
-  <div class="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8 bg-white p-10 border border-gray-300">
+  <div class="flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-6 sm:space-y-8 bg-white p-6 sm:p-10 border border-gray-300">
       <div>
         <h2 class="text-center text-xl font-normal text-gray-700">
           로그인

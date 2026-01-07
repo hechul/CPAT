@@ -42,8 +42,8 @@ const handleSubmit = async () => {
 
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="max-w-4xl mx-auto bg-white border border-gray-300 p-8">
-      <h1 class="text-xl font-normal text-gray-700 mb-8">갤러리 글쓰기</h1>
+    <div class="max-w-4xl mx-auto bg-white border border-gray-300 p-4 sm:p-8">
+      <h1 class="text-xl font-normal text-gray-700 mb-6 sm:mb-8">갤러리 글쓰기</h1>
       <div v-if="errorMessage" class="mb-6 p-4 bg-red-50 text-red-700 text-sm rounded border border-red-200">{{ errorMessage }}</div>
       <div class="space-y-6">
         <div>
@@ -56,17 +56,17 @@ const handleSubmit = async () => {
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">이미지 첨부</label>
-          <div class="border border-gray-300 p-2 flex items-center">
-            <button class="relative bg-gray-100 border border-gray-300 px-3 py-1 text-xs text-gray-700 mr-3 overflow-hidden">
+          <div class="border border-gray-300 p-2 flex items-center gap-3">
+            <button class="relative bg-gray-100 border border-gray-300 px-3 py-1 text-xs text-gray-700 overflow-hidden flex-shrink-0">
               파일 선택
               <input type="file" @change="handleFileChange" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
             </button>
-            <span class="text-sm text-gray-500">{{ file ? file.name : '선택된 파일 없음' }}</span>
+            <span class="text-sm text-gray-500 min-w-0 flex-1 truncate">{{ file ? file.name : '선택된 파일 없음' }}</span>
           </div>
         </div>
-        <div class="flex justify-end space-x-3 pt-4">
-          <NuxtLink to="/gallery" class="px-6 py-2 border border-gray-300 text-sm text-gray-600 hover:bg-gray-50">취소</NuxtLink>
-          <button @click="handleSubmit" :disabled="isSubmitting" class="px-6 py-2 bg-gray-500 text-white text-sm hover:bg-gray-600 disabled:opacity-50">
+        <div class="flex flex-col sm:flex-row sm:justify-end gap-2 pt-4">
+          <NuxtLink to="/gallery" class="px-6 py-2 border border-gray-300 text-sm text-gray-600 hover:bg-gray-50 w-full sm:w-auto text-center">취소</NuxtLink>
+          <button @click="handleSubmit" :disabled="isSubmitting" class="px-6 py-2 bg-gray-500 text-white text-sm hover:bg-gray-600 disabled:opacity-50 w-full sm:w-auto">
             {{ isSubmitting ? '등록 중...' : '등록' }}
           </button>
         </div>

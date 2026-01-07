@@ -31,9 +31,9 @@ const formatDate = (dateString: string) => {
 
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
       <h1 class="text-2xl font-normal text-gray-700">자유게시판</h1>
-      <NuxtLink to="/free/write" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 text-sm font-medium transition-colors">
+      <NuxtLink to="/free/write" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 text-sm font-medium transition-colors w-full sm:w-auto text-center">
         글쓰기
       </NuxtLink>
     </div>
@@ -47,7 +47,34 @@ const formatDate = (dateString: string) => {
         <span class="text-gray-500 font-medium">게시글을 불러오는 중...</span>
       </div>
 
-      <table class="min-w-full divide-y divide-gray-200">
+      <!-- Mobile: card list -->
+      <div class="md:hidden divide-y divide-gray-200">
+        <div v-if="!isLoading && posts.length === 0" class="px-4 py-12 text-center text-gray-500">
+          작성된 게시글이 없습니다.
+        </div>
+        <NuxtLink
+          v-for="post in posts"
+          :key="post.id"
+          :to="`/free/${post.id}`"
+          class="block px-4 py-4 hover:bg-gray-50"
+        >
+          <div class="text-sm font-medium text-gray-900 break-words">
+            {{ post.title }}
+          </div>
+          <div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500">
+            <span>{{ post.nickname }}</span>
+            <span>·</span>
+            <span>{{ formatDate(post.created_at) }}</span>
+            <span>·</span>
+            <span>조회 {{ post.view_count }}</span>
+            <span>·</span>
+            <span>댓글 {{ post.comment_count }}</span>
+          </div>
+        </NuxtLink>
+      </div>
+
+      <!-- Desktop: table -->
+      <table class="hidden md:table min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
             <th scope="col" class="px-6 py-3 text-left text-sm font-normal text-gray-500 tracking-wider w-1/2">제목</th>
@@ -74,7 +101,7 @@ const formatDate = (dateString: string) => {
       </table>
     </div>
 
-    <div v-if="totalPages > 1" class="flex justify-center mt-8 space-x-2">
+    <div v-if="totalPages > 1" class="flex flex-wrap justify-center mt-8 gap-2">
       <button @click="goToPage(page - 1)" :disabled="page === 1" class="px-3 py-1 border text-sm disabled:opacity-50">이전</button>
       <button v-for="p in totalPages" :key="p" @click="goToPage(p)" :class="['px-3 py-1 text-sm border', page === p ? 'bg-gray-500 text-white' : 'border-gray-300']">{{ p }}</button>
       <button @click="goToPage(page + 1)" :disabled="page === totalPages" class="px-3 py-1 border text-sm disabled:opacity-50">다음</button>

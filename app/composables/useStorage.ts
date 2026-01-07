@@ -27,13 +27,14 @@ export const useStorage = () => {
     try {
       const urlObj = new URL(imageUrl)
       const pathSegments = urlObj.pathname.split('/public/images/')
-      
-      if (pathSegments.length > 1) {
-        const filePath = decodeURIComponent(pathSegments[1])
+      const encodedPath = pathSegments[1]
+
+      if (encodedPath) {
+        const filePath = decodeURIComponent(encodedPath)
         const { error } = await supabase.storage
           .from('images')
           .remove([filePath])
-          
+
         if (error) console.error('Storage Delete Error:', error)
       }
     } catch (e) {

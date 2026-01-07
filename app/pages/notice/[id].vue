@@ -50,17 +50,17 @@ const formatDate = (dateString?: string) => {
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div v-if="loading" class="text-center py-12 text-gray-500">로딩 중...</div>
     <div v-else-if="post">
-      <div class="bg-white border border-gray-300 p-6 mb-6">
-        <h1 class="text-2xl font-normal text-gray-800 mb-2">{{ post.title }}</h1>
-        <div class="text-sm text-gray-500 mb-6 pb-4 border-b border-gray-200">
+      <div class="bg-white border border-gray-300 p-4 sm:p-6 mb-6">
+        <h1 class="text-xl sm:text-2xl font-normal text-gray-800 mb-2 break-words">{{ post.title }}</h1>
+        <div class="text-sm text-gray-500 mb-6 pb-4 border-b border-gray-200 break-words">
           작성자: {{ post.nickname }} | 작성일: {{ formatDate(post.created_at) }} | 조회수: {{ post.view_count }}
         </div>
-        <div class="min-h-[200px] text-gray-800 leading-relaxed mb-8 whitespace-pre-wrap"><p>{{ post.content }}</p></div>
-        <div class="flex justify-between border-t border-gray-200 pt-4">
-          <NuxtLink to="/notice" class="px-4 py-2 border border-gray-300 text-sm text-gray-600 hover:bg-gray-50">목록</NuxtLink>
+        <div class="min-h-[200px] text-gray-800 leading-relaxed mb-8 whitespace-pre-wrap break-words"><p>{{ post.content }}</p></div>
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-3 border-t border-gray-200 pt-4">
+          <NuxtLink to="/notice" class="px-4 py-2 border border-gray-300 text-sm text-gray-600 hover:bg-gray-50 w-full sm:w-auto text-center">목록</NuxtLink>
           <ClientOnly>
-            <div v-if="isOwner(post.user_id)" class="space-x-2">
-              <button @click="handleDeletePost" class="px-4 py-2 border border-gray-300 text-sm text-red-600 hover:bg-red-50">삭제</button>
+            <div v-if="isOwner(post.user_id)">
+              <button @click="handleDeletePost" class="px-4 py-2 border border-gray-300 text-sm text-red-600 hover:bg-red-50 w-full sm:w-auto">삭제</button>
             </div>
           </ClientOnly>
         </div>

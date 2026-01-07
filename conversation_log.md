@@ -41,6 +41,8 @@
     *   **Lazy Loading:** 데이터 로딩 중에도 페이지 이동이 멈추지 않음.
     *   **반응형 권한 체크:** 로그인 정보 로드 시점에 맞춰 '삭제' 버튼 자동 노출 (`computed`).
     *   **갤러리 뷰:** 이미지 중심의 그리드 레이아웃 및 상세 페이지 구현.
+    *   **반응형 목록/상세 UI:** 모바일에서는 카드/그리드, 데스크탑에서는 테이블 유지(`md:hidden`, `hidden md:table`). 글쓰기/상세/댓글 버튼도 모바일에서 자연스럽게 스택되도록 조정.
+    *   **모바일 헤더/인증 화면 개선:** 모바일에서 네비를 가로 스크롤 가능한 링크로 노출하고, 로그인/회원가입 폼 패딩/간격을 모바일 친화적으로 조정.
 
 ---
 
@@ -195,10 +197,27 @@ SELECT id, email, split_part(email, '@', 1) FROM auth.users WHERE id NOT IN (SEL
 3.  **Supabase:** Auth, Database, Storage를 통합 관리하는 BaaS.
 
 ### 🚧 향후 개선 과제 (Refactoring Recommendations)
-*   **코드 분리:** 현재 `useBoard.ts`가 모든 게시판 로직을 담당하여 비대함.
-    *   `useFreeBoard.ts`, `useGallery.ts` 등으로 역할 분리 권장.
-    *   또는 `composables/services/` 폴더 하위로 이동하여 체계적으로 관리.
+*   **코드 분리(완료):** `useBoard.ts`는 얇은 엔트리로 유지하고 역할을 파일로 분리함.
+    *   `boardTables.ts`: 게시판 타입 → 테이블 매핑 단일 소스
+    *   `boardQueries.ts`: 목록/상세 조회(+조회수 RPC)
+    *   `boardMutations.ts`: 작성/삭제(+갤러리 이미지 삭제)
+    *   `galleryImage.ts`: 스토리지 이미지 삭제 유틸
 *   **UI 컴포넌트화:** 상세 페이지(`[id].vue`)의 댓글 섹션 등 반복되는 UI를 별도 컴포넌트로 분리하여 재사용성 증대 필요.
+
+### 🧩 클라이언트 직결 vs 서버 도입 (권장 운영 방식)
+현재 구조는 클라이언트에서 Supabase(Auth/DB/Storage)를 직접 호출하는 방식이며, **RLS/Storage 정책이 탄탄하면 단순 CRUD는 서버 없이도 운영 가능**합니다.
+
+- **클라이언트 직결 장점:** 구현/배포가 빠르고 구조가 단순함, Supabase RLS로 기본 권한 통제가 가능
+- **클라이언트 직결 한계:** 클라이언트는 변조 가능(관리자 액션 신뢰 불가), 비밀키 보관 불가, 레이트리밋/스팸 방지/복잡한 검증·트랜잭션/감사로그 적용이 어려움
+
+**관리자 전용 기능/특수 호출을 서버(예: Nuxt server routes, Supabase Edge Function/RPC)로 분리하면** 아래가 쉬워집니다.
+- 관리자 검증(서버에서 JWT 검증 후 role 기반 실행)
+- 외부 API/결제/메일 등 **시크릿 키 안전 보관**
+- 레이트리밋, 스팸 방지, 차단 정책(계정/IP 기준)
+- 복잡한 비즈니스 규칙·원자적 처리(트랜잭션)
+- 감사 로그/모니터링/알림(Slack 등)
+
+➡️ **현업 권장:** 공개 읽기/단순 CRUD는 클라+RLS로 유지하고, **관리자/결제/집계/외부 API/스팸 대응**만 서버(또는 Edge Function/RPC)로 단계적 도입하는 하이브리드.
 
 ---
 
@@ -209,3 +228,6 @@ SELECT id, email, split_part(email, '@', 1) FROM auth.users WHERE id NOT IN (SEL
 2.  **삭제 버튼 미노출:** `onMounted`에서 `auth.getUser()`로 유저 정보를 강제 로드하고 `computed`로 반응성 확보.
 3.  **스토리지 이미지 삭제 실패:** URL 파싱 로직 개선 및 Storage `DELETE` 정책 추가.
 4.  **라우팅 충돌:** `[...slug].vue` 파일 삭제로 정상 라우팅 복구.
+5.  **Vercel 배포 Google OAuth `redirect_uri_mismatch`:** 배포가 다른 Supabase project ref를 참조한 것이 원인. Vercel의 `SUPABASE_URL/SUPABASE_KEY`를 로컬과 동일 ref로 맞추고, Google Redirect URI에 `https://<supabase_ref>.supabase.co/auth/v1/callback` 등록 후 재배포.
+6.  **TypeScript 경고(빨간줄)인데 동작:** `split()` 인덱스 접근 등 undefined 가능성을 가드하여 타입 경고 제거(런타임 로직은 동일).
+7.  **모바일 반응형 UI:** 목록은 모바일 카드/그리드 + 데스크탑 테이블(`md:hidden`, `hidden md:table`) 패턴으로 정리하고, 상세/글쓰기/헤더/인증 화면까지 모바일 레이아웃을 조정. (추가: 갤러리 댓글 입력은 로그인 시만 노출, 갤러리 글쓰기 파일명은 모바일에서 truncate 처리)

@@ -1,9 +1,11 @@
 import type { Comment, BoardType } from '~/types'
 
+type CommentsTable = 'free_comments' | 'gallery_comments'
+
 export const useComments = () => {
   const supabase = useSupabaseClient()
 
-  const getTable = (type: BoardType) => {
+  const getTable = (type: BoardType): CommentsTable => {
     if (type === 'notice') throw new Error('공지사항은 댓글을 지원하지 않습니다.')
     return type === 'free' ? 'free_comments' : 'gallery_comments'
   }

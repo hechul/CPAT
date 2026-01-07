@@ -24,17 +24,44 @@ const formatDate = (dateString: string) => {
 
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
       <h1 class="text-2xl font-normal text-gray-700">공지사항</h1>
-      <NuxtLink to="/notice/write" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 text-sm font-medium transition-colors">
+      <NuxtLink to="/notice/write" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 text-sm font-medium transition-colors w-full sm:w-auto text-center">
         글쓰기
       </NuxtLink>
     </div>
 
-    <div v-if="isLoading" class="text-center py-12 text-gray-500">로딩 중...</div>
+    <div class="bg-white border-t border-gray-200 relative min-h-[200px]">
+      <div v-if="isLoading" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+        <span class="text-gray-500 font-medium">공지사항을 불러오는 중...</span>
+      </div>
 
-    <div v-else class="bg-white border-t border-gray-200">
-      <table class="min-w-full divide-y divide-gray-200">
+      <!-- Mobile: card list -->
+      <div class="md:hidden divide-y divide-gray-200">
+        <div v-if="!isLoading && posts.length === 0" class="px-4 py-12 text-center text-gray-500">
+          등록된 공지사항이 없습니다.
+        </div>
+        <NuxtLink
+          v-for="post in posts"
+          :key="post.id"
+          :to="`/notice/${post.id}`"
+          class="block px-4 py-4 hover:bg-gray-50"
+        >
+          <div class="text-sm font-medium text-gray-900 break-words">
+            {{ post.title }}
+          </div>
+          <div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500">
+            <span>{{ post.nickname }}</span>
+            <span>·</span>
+            <span>{{ formatDate(post.created_at) }}</span>
+            <span>·</span>
+            <span>조회 {{ post.view_count }}</span>
+          </div>
+        </NuxtLink>
+      </div>
+
+      <!-- Desktop: table -->
+      <table class="hidden md:table min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
             <th scope="col" class="px-6 py-3 text-left text-sm font-normal text-gray-500 tracking-wider w-1/2">제목</th>

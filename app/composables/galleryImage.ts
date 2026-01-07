@@ -5,8 +5,9 @@ export const deleteGalleryImageForPost = async (supabase: any, postsTable: strin
   try {
     const urlObj = new URL(data.image_url)
     const pathSegments = urlObj.pathname.split('/public/images/')
-    if (pathSegments.length > 1) {
-      await supabase.storage.from('images').remove([decodeURIComponent(pathSegments[1])])
+    const filePath = pathSegments[1]
+    if (filePath) {
+      await supabase.storage.from('images').remove([decodeURIComponent(filePath)])
     }
   } catch (e) {
     console.error('Image delete error:', e)

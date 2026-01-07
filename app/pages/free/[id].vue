@@ -95,32 +95,32 @@ const formatDate = (dateString?: string) => {
     <div v-else-if="errorMsg" class="text-red-500 text-center py-12">{{ errorMsg }}</div>
     
     <div v-else-if="post">
-      <div class="bg-white border border-gray-300 p-6 mb-6">
-        <h1 class="text-2xl font-normal text-gray-800 mb-2">{{ post.title }}</h1>
-        <div class="text-sm text-gray-500 mb-6 pb-4 border-b border-gray-200">
+      <div class="bg-white border border-gray-300 p-4 sm:p-6 mb-6">
+        <h1 class="text-xl sm:text-2xl font-normal text-gray-800 mb-2 break-words">{{ post.title }}</h1>
+        <div class="text-sm text-gray-500 mb-6 pb-4 border-b border-gray-200 break-words">
           작성자: {{ post.nickname }} | 작성일: {{ formatDate(post.created_at) }} | 조회수: {{ post.view_count }}
         </div>
         <div class="whitespace-pre-wrap min-h-[100px] text-gray-800 leading-relaxed mb-8">{{ post.content }}</div>
         
-        <div class="flex justify-between border-t border-gray-200 pt-4">
-          <NuxtLink to="/free" class="px-4 py-2 border border-gray-300 text-sm text-gray-600 hover:bg-gray-50">목록</NuxtLink>
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-3 border-t border-gray-200 pt-4">
+          <NuxtLink to="/free" class="px-4 py-2 border border-gray-300 text-sm text-gray-600 hover:bg-gray-50 w-full sm:w-auto text-center">목록</NuxtLink>
           <ClientOnly>
-            <button v-if="canDeletePost" @click="handleDeletePost" class="px-4 py-2 border border-gray-300 text-sm text-red-600 hover:bg-red-50">삭제</button>
+            <button v-if="canDeletePost" @click="handleDeletePost" class="px-4 py-2 border border-gray-300 text-sm text-red-600 hover:bg-red-50 w-full sm:w-auto">삭제</button>
           </ClientOnly>
         </div>
       </div>
 
-      <div class="bg-white border border-gray-300 p-6">
+      <div class="bg-white border border-gray-300 p-4 sm:p-6">
         <h3 class="text-lg font-normal text-gray-700 mb-6">댓글 {{ comments.length }}</h3>
-        <div v-if="comments.length > 0" class="space-y-6 mb-8">
+        <div v-if="comments.length > 0" class="space-y-5 mb-8">
           <div v-for="c in comments" :key="c.id" class="border-b border-gray-100 pb-4">
-            <div class="flex justify-between items-center mb-2">
-              <span class="font-bold text-gray-700 text-sm">{{ c.nickname }}</span>
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 mb-2">
+              <span class="font-bold text-gray-700 text-sm break-words">{{ c.nickname }}</span>
               <span class="text-xs text-gray-400">{{ formatDate(c.created_at) }}</span>
             </div>
-            <p class="text-gray-600 text-sm mb-2">{{ c.content }}</p>
+            <p class="text-gray-600 text-sm mb-2 whitespace-pre-wrap break-words">{{ c.content }}</p>
             <ClientOnly>
-              <div v-if="canDeleteComment(c.user_id)" class="space-x-2">
+              <div v-if="canDeleteComment(c.user_id)">
                  <button @click="handleDeleteComment(c.id)" class="px-2 py-1 border border-gray-300 text-xs text-red-500 hover:bg-red-50">삭제</button>
               </div>
             </ClientOnly>
@@ -129,8 +129,10 @@ const formatDate = (dateString?: string) => {
         
         <div class="border-t border-gray-200 pt-6">
           <template v-if="currentUser">
-            <textarea v-model="newComment" class="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-indigo-500 mb-3" rows="3" placeholder="댓글을 입력하세요"></textarea>
-            <div class="flex justify-end"><button @click="submitComment" class="bg-gray-500 text-white px-4 py-2 text-sm hover:bg-gray-600">댓글 작성</button></div>
+            <textarea v-model="newComment" class="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-indigo-500 mb-3" rows="4" placeholder="댓글을 입력하세요"></textarea>
+            <div class="flex flex-col sm:flex-row sm:justify-end gap-2">
+              <button @click="submitComment" class="bg-gray-500 text-white px-4 py-2 text-sm hover:bg-gray-600 w-full sm:w-auto">댓글 작성</button>
+            </div>
           </template>
           <template v-else>
              <div class="bg-gray-50 p-4 text-center text-sm text-gray-500">댓글을 작성하려면 <NuxtLink to="/login" class="text-blue-600 underline">로그인</NuxtLink>이 필요합니다.</div>
